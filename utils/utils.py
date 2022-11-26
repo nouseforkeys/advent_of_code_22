@@ -7,7 +7,7 @@ import pathlib
 
 def load_from_file(
     file: pathlib.Path,
-    cast_as: type | list[type] = [str], delimiter: str = ','
+    cast_as: type | list[type] = str, delimiter: str = ','
 ) -> list:
     """
     returns the contents of a file as a list where each item in the list was
