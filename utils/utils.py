@@ -57,7 +57,7 @@ def parse_string(string: str, parse_config: ParseConfig) -> list:
     list object.
 
     The parse_config.parser argument:
-    - The parse_config.delimiter will be used to split the string into segments
+    - parse_config.delimiter will be used to split the string into segments
     - If the parser specified is Callable, this function will be called on each
     delimited string segment.
     - If the parser is a ParseConfig, this parse config will be applied to
