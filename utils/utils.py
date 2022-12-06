@@ -51,7 +51,7 @@ def parse_from_file(file: pathlib.Path, parse_config: ParseConfig) -> list:
     to be split by \n before being parsed line by line.
     """
     with open(file) as f:
-        entire_file = f.read()
+        entire_file = f.read().strip()
     return parse_string(entire_file, parse_config)
 
 
