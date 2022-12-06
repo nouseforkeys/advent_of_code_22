@@ -45,10 +45,14 @@ class ParseConfig:
 
 def parse_from_file(file: pathlib.Path, parse_config: ParseConfig) -> list:
     """
-    parses each line from a file recursively using the parse config.
+    parses an entire file using the parse config
+
+    the file is passed in it's entirity to parse_string() so a file may need
+    to be split by \n before being parsed line by line.
     """
-    lines = load_from_file(file)
-    return [parse_string(line, parse_config) for line in lines]
+    with open(file) as f:
+        entire_file = f.read()
+    return parse_string(entire_file, parse_config)
 
 
 def parse_string(string: str, parse_config: ParseConfig) -> list:
@@ -74,8 +78,12 @@ def parse_string(string: str, parse_config: ParseConfig) -> list:
             raise ValueError(
                 'ParseConfig list not same length as delimited segments: '
                 f'{parse_config}, {segments}')
-        return [
-            parser(segment) for parser, segment in
-            zip(parse_config.parser, segments)]
+        temp = []
+        for parser, segment in zip(parse_config.parser, segments):
+            if isinstance(parser, ParseConfig):
+                temp.append(parse_string(segment, parser))
+            else:
+                temp.append(parser(segment))
+        return temp
     else:
         return [parse_config.parser(segment) for segment in segments]
