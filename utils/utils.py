@@ -62,6 +62,8 @@ def parse_string(string: str, parse_config: ParseConfig) -> list:
 
     The parse_config.parser argument:
     - parse_config.delimiter will be used to split the string into segments
+    - parse_config.delimiter can be an empty string. This will create a list of
+    every character in a string.
     - If the parser specified is Callable, this function will be called on each
     delimited string segment.
     - If the parser is a ParseConfig, this parse config will be applied to
@@ -69,7 +71,10 @@ def parse_string(string: str, parse_config: ParseConfig) -> list:
     - If the parser is a list the Callable or ParseConfig items in the list
     will be used to parse the corresponding delimited string segment by index.
     """
-    segments = string.split(parse_config.delimiter)
+    if parse_config.delimiter == '':
+        segments = [char for char in string]
+    else:
+        segments = string.split(parse_config.delimiter)
     if isinstance(parse_config.parser, ParseConfig):
         return [
             parse_string(segment, parse_config.parser) for segment in segments]
