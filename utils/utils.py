@@ -79,9 +79,9 @@ def parse_string(string: str, parse_config: ParseConfig) -> list:
         return [
             parse_string(segment, parse_config.parser) for segment in segments]
     elif isinstance(parse_config.parser, list):
-        if len(parse_config.parser) != len(segments):
+        if len(parse_config.parser) < len(segments):
             raise ValueError(
-                'ParseConfig list not same length as delimited segments: '
+                'ParseConfig list not as long as delimited segments: '
                 f'{parse_config}, {segments}')
         temp = []
         for parser, segment in zip(parse_config.parser, segments):
