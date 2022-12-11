@@ -85,7 +85,9 @@ def parse_string(string: str, parse_config: ParseConfig) -> list:
                 f'{parse_config}, {segments}')
         temp = []
         for parser, segment in zip(parse_config.parser, segments):
-            if isinstance(parser, ParseConfig):
+            if parser is None:
+                continue
+            elif isinstance(parser, ParseConfig):
                 temp.append(parse_string(segment, parser))
             else:
                 temp.append(parser(segment))
