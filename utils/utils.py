@@ -43,19 +43,26 @@ class ParseConfig:
     parser: 'Callable | ParseConfig | list[Callable | ParseConfig]'
 
 
-def parse_from_file(file: pathlib.Path, parse_config: ParseConfig) -> list:
+def parse_from_file(
+    file: pathlib.Path, parse_config: ParseConfig,
+    unnest_single_items: bool = False
+) -> list:
     """
     parses an entire file using the parse config
 
     the file is passed in it's entirity to parse_string() so a file may need
     to be split by \n before being parsed line by line.
+
+    can be specified to unnest single items if parsing only appends one item
     """
     with open(file) as f:
         entire_file = f.read().strip()
-    return parse_string(entire_file, parse_config)
+    return parse_string(entire_file, parse_config, unnest_single_items)
 
 
-def parse_string(string: str, parse_config: ParseConfig) -> list:
+def parse_string(
+    string: str, parse_config: ParseConfig,  unnest_singles: bool = False
+) -> list:
     """
     recursively parses a string using the parse_config to return a multi-level
     list object.
@@ -70,14 +77,22 @@ def parse_string(string: str, parse_config: ParseConfig) -> list:
     to each delimited string segment, creating sub-lists.
     - If the parser is a list the Callable or ParseConfig items in the list
     will be used to parse the corresponding delimited string segment by index.
+
+    if specified lists of a single item will return that item instead of a list
     """
+    # break up string using delimiter
     if parse_config.delimiter == '':
         segments = [char for char in string]
     else:
         segments = string.split(parse_config.delimiter)
+
+    # parse string segments
+    parsed_output = []
     if isinstance(parse_config.parser, ParseConfig):
-        return [
-            parse_string(segment, parse_config.parser) for segment in segments]
+        parsed_output = [
+            parse_string(segment, parse_config.parser, unnest_singles)
+            for segment in segments
+        ]
     elif isinstance(parse_config.parser, list):
         if len(parse_config.parser) < len(segments):
             raise ValueError(
@@ -88,9 +103,15 @@ def parse_string(string: str, parse_config: ParseConfig) -> list:
             if parser is None:
                 continue
             elif isinstance(parser, ParseConfig):
-                temp.append(parse_string(segment, parser))
+                temp.append(parse_string(segment, parser, unnest_singles))
             else:
                 temp.append(parser(segment))
-        return temp
+        parsed_output = temp
     else:
-        return [parse_config.parser(segment) for segment in segments]
+        parsed_output = [parse_config.parser(segment) for segment in segments]
+
+    # unnest output if specified to do so
+    if unnest_singles and len(parsed_output) == 1:
+        return parsed_output.pop()
+    else:
+        return parsed_output
