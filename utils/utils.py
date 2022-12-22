@@ -56,7 +56,7 @@ def parse_from_file(
     can be specified to unnest single items if parsing only appends one item
     """
     with open(file) as f:
-        entire_file = f.read().strip()
+        entire_file = f.read().rstrip()
     return parse_string(entire_file, parse_config, unnest_single_items)
 
 
