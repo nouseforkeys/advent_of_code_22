@@ -1,3 +1,6 @@
 # notebook exports
 *.html
 *.pdf
+
+# GIMP projects
+*.xcf
